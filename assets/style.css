@@ -1,0 +1,282 @@
+/* ==========================================================================
+   Bottler — global design system
+   Injected once via theme.py. Do not rely on Streamlit defaults elsewhere.
+   ========================================================================== */
+
+:root{
+  --b-primary:#2563EB;
+  --b-primary-hover:#1D4ED8;
+  --b-primary-active:#1E40AF;
+  --b-primary-muted:#EFF6FF;
+  --b-primary-soft:#DBEAFE;
+  --b-primary-border:#BFDBFE;
+
+  --b-text:#0F172A;
+  --b-text-muted:#64748B;
+  --b-text-faint:#94A3B8;
+
+  --b-surface:#FFFFFF;
+  --b-surface-alt:#F8FAFC;
+  --b-border:#E2E8F0;
+
+  --b-critical:#DC2626;   --b-critical-bg:#FEF2F2;  --b-critical-border:#FECACA;
+  --b-warning:#EA580C;    --b-warning-bg:#FFF7ED;   --b-warning-border:#FED7AA;
+  --b-caution:#CA8A04;    --b-caution-bg:#FEFCE8;   --b-caution-border:#FDE68A;
+  --b-ok:#16A34A;         --b-ok-bg:#F0FDF4;        --b-ok-border:#BBF7D0;
+
+  --b-radius-sm:8px;
+  --b-radius-md:12px;
+  --b-radius-lg:16px;
+  --b-shadow-sm:0 1px 2px rgba(15,23,42,0.06);
+  --b-shadow-md:0 4px 14px rgba(15,23,42,0.08);
+  --b-space-1:4px; --b-space-2:8px; --b-space-3:12px; --b-space-4:16px;
+  --b-space-5:24px; --b-space-6:32px;
+}
+
+/* ---- base typography ---------------------------------------------------- */
+html, body, [class*="css"] {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--b-text);
+}
+h1, h2, h3, h4 { color: var(--b-text); font-weight: 700; letter-spacing:-0.01em; }
+p, span, div { letter-spacing: -0.005em; }
+
+/* ---- app chrome ----------------------------------------------------------- */
+/* Hide Streamlit's default "Deploy" button and hamburger/kebab menu, but
+   deliberately do NOT hide the whole <header> - when the sidebar is
+   collapsed, Streamlit renders the sidebar-restore button
+   (stExpandSidebarButton) INSIDE this same header. Hiding the header with
+   visibility:hidden previously hid that button too, along with it,
+   permanently trapping the sidebar in its collapsed state with no way to
+   bring it back. */
+#MainMenu, footer { display:none; }
+header[data-testid="stHeader"]{ background: transparent; box-shadow:none; }
+.block-container{ padding-top: 1.4rem; padding-bottom: 3rem; max-width: 1400px; }
+
+/* ---- buttons (unified system) ----------------------------------------------
+   Streamlit's own default "primary" color (a coral/red) leaked through on
+   every plain st.button(type="primary") that wasn't a form-submit button -
+   e.g. "Backup Now", "Finalize & Save Purchase/Invoice" all rendered in the
+   wrong color. Unify every primary/secondary button (main-area AND inside
+   forms) to the same brand blue here. */
+.stButton>button, div[data-testid="stFormSubmitButton"] button{
+  border-radius: var(--b-radius-sm); font-weight:600; transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.stButton>button[kind="primary"], div[data-testid="stFormSubmitButton"] button{
+  background: var(--b-primary); color:#fff !important; border:1px solid var(--b-primary);
+  font-weight:700; padding:0.55rem 1.1rem;
+}
+.stButton>button[kind="primary"]:hover, div[data-testid="stFormSubmitButton"] button:hover{
+  background: var(--b-primary-hover); border-color: var(--b-primary-hover);
+}
+.stButton>button[kind="primary"]:active, div[data-testid="stFormSubmitButton"] button:active{
+  background: var(--b-primary-active); border-color: var(--b-primary-active);
+}
+.stButton>button[kind="secondary"]{
+  background: var(--b-surface); color: var(--b-text); border:1px solid var(--b-border);
+}
+.stButton>button[kind="secondary"]:hover{
+  background: var(--b-surface-alt); border-color: var(--b-primary-border); color: var(--b-primary);
+}
+
+/* ---- form inputs (text/number/date/select/textarea) -------------------------
+   Streamlit's bare grey-fill inputs get a touch of the same design system:
+   subtle border, rounded corners, and a visible blue focus ring so keyboard
+   users can see where they are. */
+div[data-testid="stTextInput"] input,
+div[data-testid="stNumberInput"] input,
+div[data-testid="stDateInput"] input,
+div[data-testid="stTextArea"] textarea,
+div[data-baseweb="select"] > div{
+  border-radius: var(--b-radius-sm) !important;
+  border: 1px solid var(--b-border) !important;
+  background: var(--b-surface-alt) !important;
+}
+div[data-testid="stTextInput"] input:focus,
+div[data-testid="stNumberInput"] input:focus,
+div[data-testid="stDateInput"] input:focus,
+div[data-testid="stTextArea"] textarea:focus,
+div[data-baseweb="select"]:focus-within > div{
+  border-color: var(--b-primary) !important;
+  box-shadow: 0 0 0 3px var(--b-primary-muted) !important;
+}
+div[data-testid="stWidgetLabel"] p{ font-weight:600; font-size:0.86rem; }
+/* Streamlit renders radio/checkbox indicators as custom-styled divs/SVGs
+   (the real <input> is visually hidden), so CSS `accent-color` has no
+   effect - these structural selectors target the actual colored shapes
+   directly to replace Streamlit's default red (#FF4B4B) with brand blue. */
+label[data-testid="stRadioOption"][data-selected="true"] > div > div > div{
+  background-color: var(--b-primary) !important;
+}
+label[data-selected="true"] div:has(> svg){
+  background-color: var(--b-primary) !important; border-color: var(--b-primary) !important;
+}
+/* Match the brand blue for radio/checkbox selection dots instead of the
+   browser's default system accent color. */
+input[type="radio"], input[type="checkbox"]{ accent-color: var(--b-primary); }
+
+/* ---- dataframes & expanders -------------------------------------------------- */
+div[data-testid="stDataFrame"]{
+  border-radius: var(--b-radius-md); overflow:hidden; border:1px solid var(--b-border);
+}
+div[data-testid="stExpander"]{
+  border-radius: var(--b-radius-md); border:1px solid var(--b-border); overflow:hidden;
+}
+
+section[data-testid="stSidebar"]{
+  background: linear-gradient(180deg, #0F172A 0%, #111827 100%);
+  border-right: 1px solid #1F2937;
+}
+section[data-testid="stSidebar"] *{ color:#E2E8F0 !important; }
+section[data-testid="stSidebar"] .stRadio label,
+section[data-testid="stSidebar"] .stButton button{ font-weight:500; }
+/* Inactive nav item: transparent, muted, subtle hover highlight. */
+section[data-testid="stSidebar"] .stButton>button[kind="secondary"]{
+  background: transparent; border:1px solid transparent; text-align:left;
+  border-radius: var(--b-radius-sm); width:100%; color:#CBD5E1 !important; font-weight:500;
+}
+section[data-testid="stSidebar"] .stButton>button[kind="secondary"]:hover{
+  background: rgba(37,99,235,0.16); border-color:#2563EB44;
+}
+/* Active nav item: solid filled brand-blue pill so it's unmistakable even
+   at rest (previously both active and inactive items were fully
+   transparent, so there was NO way to tell which module/sub-module was
+   currently selected once the mouse moved away from it). */
+section[data-testid="stSidebar"] .stButton>button[kind="primary"]{
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  border:1px solid #3B82F6; text-align:left; border-radius: var(--b-radius-sm); width:100%;
+  color:#fff !important; font-weight:700; box-shadow: 0 2px 10px rgba(37,99,235,0.35);
+}
+section[data-testid="stSidebar"] .stButton>button[kind="primary"]:hover{
+  background: linear-gradient(135deg, #1D4ED8, #1E40AF);
+}
+
+/* Sidebar brand header */
+.b-brand{
+  display:flex; align-items:center; gap:10px; padding: 4px 4px 18px 4px;
+  border-bottom: 1px solid #1F2937; margin-bottom: 14px;
+}
+.b-brand img{
+  height:34px; padding: 6px 10px; background:#fff; border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+.b-brand-name{ font-size:1.05rem; font-weight:800; color:#fff !important; }
+.b-brand-sub{ font-size:0.72rem; color:#94A3B8 !important; margin-top:-2px; }
+
+.b-distro-badge{
+  background:#1E293B; border:1px solid #334155; border-radius:10px;
+  padding:8px 10px; margin: 6px 0 18px 0; font-size:0.76rem; color:#CBD5E1 !important;
+}
+.b-distro-badge b{ color:#fff !important; display:block; font-size:0.82rem; }
+
+/* ---- top horizontal tab bar ---------------------------------------------- */
+button[data-baseweb="tab"]{
+  font-weight:600; font-size:0.92rem; color: var(--b-text-muted);
+}
+button[data-baseweb="tab"][aria-selected="true"]{ color: var(--b-primary) !important; }
+div[data-baseweb="tab-highlight"]{ background-color: var(--b-primary) !important; height:3px; }
+div[data-baseweb="tab-border"]{ background-color: var(--b-border) !important; }
+
+/* ---- KPI cards (premium style) --------------------------------------------
+   Icon sits in a soft tinted rounded-square badge (color per status), value
+   is the visual anchor (large, bold, tabular numerals), label is a small
+   uppercase caption. A thin accent line across the top (not a heavy left
+   bar) plus a soft lift-on-hover keeps this feeling like a modern dashboard
+   rather than a bootstrap admin theme. */
+.b-kpi-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));
+  gap:16px;
+  margin-bottom: 8px;
+}
+.b-kpi{
+  background: var(--b-surface);
+  border:1px solid var(--b-border);
+  border-radius: 14px;
+  padding: 18px 20px 16px 20px;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 1px 1px rgba(15,23,42,0.03);
+  position:relative;
+  overflow:hidden;
+  transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+}
+.b-kpi:hover{
+  box-shadow: 0 10px 28px rgba(15,23,42,0.10), 0 2px 6px rgba(15,23,42,0.05);
+  transform: translateY(-2px);
+}
+.b-kpi::before{
+  content:""; position:absolute; left:0; right:0; top:0; height:3px;
+  background: var(--accent, var(--b-primary)); border-radius: 14px 14px 0 0;
+}
+.b-kpi-icon-wrap{
+  width:38px; height:38px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  background: var(--accent-bg, var(--b-primary-muted));
+  margin-bottom:14px;
+}
+.b-kpi-icon-wrap .b-kpi-icon{ font-size:1.05rem; line-height:1; display:block; }
+.b-kpi-label{
+  font-size:0.72rem; font-weight:700; color:var(--b-text-muted);
+  text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;
+}
+.b-kpi-value{
+  font-size:1.7rem; font-weight:800; color:var(--b-text); line-height:1.15;
+  font-variant-numeric: tabular-nums; letter-spacing:-0.01em;
+}
+.b-kpi-delta{
+  font-size:0.74rem; font-weight:700; margin-top:9px; display:inline-flex;
+  align-items:center; gap:4px; padding:2px 9px; border-radius:999px;
+  background: var(--accent-bg, var(--b-primary-muted));
+}
+
+/* status badge chips (tables, headers) */
+.b-badge{
+  display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px;
+  font-size:0.74rem; font-weight:700; border:1px solid transparent;
+}
+.b-badge-critical{ background:var(--b-critical-bg); color:var(--b-critical); border-color:var(--b-critical-border); }
+.b-badge-warning{ background:var(--b-warning-bg); color:var(--b-warning); border-color:var(--b-warning-border); }
+.b-badge-caution{ background:var(--b-caution-bg); color:var(--b-caution); border-color:var(--b-caution-border); }
+.b-badge-ok{ background:var(--b-ok-bg); color:var(--b-ok); border-color:var(--b-ok-border); }
+
+/* ---- section / card wrapper ------------------------------------------------ */
+/* ---- section / card wrapper ------------------------------------------------
+   Real bordered container via st.container(border=True) - see
+   components/kpi_card.py:section_card() for why this replaced raw HTML
+   <div> tags opened/closed across separate st.markdown() calls (which
+   rendered as an empty box, since Streamlit elements don't nest into each
+   other's dangling HTML). data-test-wrap="false" is what Streamlit sets on
+   BOTH bordered and unbordered st.container() - this app only ever uses
+   the bordered form of st.container(), so the selector is unambiguous here. */
+div[data-testid="stVerticalBlock"][data-test-wrap="false"]{
+  border-radius: var(--b-radius-lg) !important; border-color: var(--b-border) !important;
+  padding: 20px 22px !important;
+  box-shadow: 0 1px 2px rgba(15,23,42,0.04), 0 1px 1px rgba(15,23,42,0.03);
+  margin-bottom: 18px;
+}
+.b-card-title{ font-size:1.02rem; font-weight:700; margin-bottom:2px; }
+.b-card-sub{ font-size:0.82rem; color:var(--b-text-muted); margin-bottom:14px; }
+
+/* ---- empty state ------------------------------------------------------------ */
+.b-empty{
+  text-align:center; padding: 36px 18px; color: var(--b-text-muted);
+  border:1.5px dashed var(--b-border); border-radius: var(--b-radius-lg); background: var(--b-surface-alt);
+}
+.b-empty-icon{ font-size:1.8rem; margin-bottom:8px; }
+
+/* ---- login / activation screens --------------------------------------------- */
+.b-auth-title{ font-size:1.3rem; font-weight:800; margin-bottom:2px; text-align:center; }
+.b-auth-sub{ color:var(--b-text-muted); font-size:0.86rem; margin-bottom:22px; text-align:center; }
+/* Only ever used for the brand logo on the activation/login screens - safe
+   to center globally. */
+div[data-testid="stImage"]{ display:flex; justify-content:center; margin-bottom: 6px; }
+
+/* ---- responsive breakpoints -------------------------------------------------- */
+@media (max-width: 900px){
+  .block-container{ padding-left:1rem; padding-right:1rem; }
+  .b-kpi-row{ grid-template-columns:repeat(2,1fr); gap:12px; }
+}
+@media (max-width: 640px){
+  .b-kpi-row{ grid-template-columns:1fr; gap:12px; }
+  div[data-testid="stVerticalBlock"][data-test-wrap="false"]{ padding:16px !important; }
+  div[data-testid="stVerticalBlock"][data-test-wrap="false"]{ margin-top: 2vh; }
+}
